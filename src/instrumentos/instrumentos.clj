@@ -1,6 +1,4 @@
-(ns commons.various
-	(:use (clojure xml) ))
-
+(ns instrumentos.instrumentos)
 
 (defn dissoc-in 
 	[ data keys & keys-to-remove ]
