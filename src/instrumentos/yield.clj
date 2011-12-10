@@ -21,7 +21,8 @@
 			(bound-future (do ~@content (*yield-fn*))) s#)))
 
 
-
-
-
+;
+;(defn abc[ a ]
+;	(println "ahhah2" a))
+;
 
