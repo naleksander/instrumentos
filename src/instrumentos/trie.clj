@@ -3,60 +3,57 @@
 (defn conr[ col item ]
 	(lazy-seq
 		(if (seq col)
-			(let[ [f &  r] col ]
-				(if (seq r)
-					(cons f (conr r item))
-					(cons f [item])))
-			[item])))
+			(cons (first col) (conr (rest col) item))
+			(list item))))
 
-(defn tire-key-seq[ key ]
+(defn trie-key-seq[ key ]
 	(cons :node (interpose :node key)))
 
-(defn tire-assoc[ col key item ]
-	(assoc-in col (conr (tire-key-seq key) :val) item))
+(defn trie-assoc[ col key item ]
+	(assoc-in col (conr (trie-key-seq key) :val) item))
 
-(defn deref-tire-vals[ col ]
-	(let [ rst (mapcat (fn[ [ k v] ] (deref-tire-vals v) ) (:node col)) ]
-		(if-let[ val (:val col) ]
-			(conr rst val)
-			rst)))
+(defn deref-trie-vals[ col ]
+	(let [ rst (mapcat (fn[ [ k v] ] (deref-trie-vals v) ) (:node col)) ]
+		(if (contains? col :val)
+			(conr rst (:val col))
+				rst)))
 
-(defn deref-tire-keys[ col word ]
-	(let [ rst  (mapcat (fn[ [ k v] ] (deref-tire-keys v (str word k)) ) (:node col)) ]
-		(if-let[ val (:val col) ]
+(defn deref-trie-keys[ col word ]
+	(let [ rst (mapcat (fn[ [ k v] ] (deref-trie-keys v (str word k)) ) (:node col)) ]
+		(if (contains? col :val)
 			(cons word rst)
 					rst)))
 
-(defn tire-vals
+(defn trie-vals
 	([ col ]
-		(deref-tire-vals col))
+		(deref-trie-vals col))
 	([ col key ]
 		(if (seq key)
-			(deref-tire-vals (get-in col (tire-key-seq key)))
-			(tire-vals col))))
+			(deref-trie-vals (get-in col (trie-key-seq key)))
+			(trie-vals col))))
 
-(defn tire-keys
+(defn trie-keys
 	([ col ]
-		(deref-tire-keys col ""))
+		(deref-trie-keys col ""))
 	([ col key ]
 		(if (seq key)
-			(deref-tire-keys (get-in col (tire-key-seq key)) key)
-			(tire-keys col))))
+			(deref-trie-keys (get-in col (trie-key-seq key)) key)
+			(trie-keys col))))
 
 
 ;(def g (-> {}
-;	(tire-assoc "a" 2)
-;	(tire-assoc "ab" 3)
-;	(tire-assoc "abz" 4)
-;	(tire-assoc "abzg" 5)
-;	(tire-assoc "brokowski" 4)
-;	(tire-assoc "b" 22)
-;	(tire-assoc "bb" 33)
-;	(tire-assoc "bbz" 44)
-;	(tire-assoc "bbzg" 55)
-;	(tire-assoc "brozowski" 5)))
+;	(trie-assoc "a" 2)
+;	(trie-assoc "ab" 3)
+;	(trie-assoc "abz" 4)
+;	(trie-assoc "abzg" 5)
+;	(trie-assoc "brokowski" 4)
+;	(trie-assoc "b" 22)
+;	(trie-assoc "bb" 33)
+;	(trie-assoc "bbz" 44)
+;	(trie-assoc "bbzg" 55)
+;	(trie-assoc "brozowski" 5)))
 ;
-;(tire-keys g "a")
+;(trie-keys g "a")
 
 
 ;(def g { :node { "a" { :val 2
